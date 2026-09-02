@@ -36,8 +36,12 @@ export const saveOrUpdateEdpResults = async ({ db, quoteId, edps }) => {
     if (
       existing.edp_name !== edp.edpName ||
       existing.edp_type !== edp.edpType ||
-      Number.parseFloat(existing.levy_gbp_min) !== edp.levyGbp.min ||
-      Number.parseFloat(existing.levy_gbp_max) !== edp.levyGbp.max ||
+      Number.parseFloat(existing.levy_excluding_vat) !==
+        edp.levyGbp.amountExcludingVat ||
+      Number.parseFloat(existing.levy_inflation_adjusted) !==
+        edp.levyGbp.amountInflationAdjusted ||
+      Number.parseFloat(existing.levy_base_amount) !== edp.levyGbp.baseAmount ||
+      existing.levy_model_version !== edp.levyGbp.modelVersion ||
       impactChanged
     ) {
       await dbUpdateEdpResult({ db, quoteId, edpId: edp.edpId, edp })

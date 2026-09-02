@@ -26,8 +26,10 @@ describe('mapQuoteRows', () => {
         edp_name: 'Test EDP',
         edp_type: 'flood',
         impact: { score: 1 },
-        levy_gbp_min: 100,
-        levy_gbp_max: 200
+        levy_excluding_vat: '1100.00',
+        levy_base_amount: '1000.00',
+        levy_inflation_adjusted: '1122.00',
+        levy_model_version: 1
       }
     ]
 
@@ -58,10 +60,18 @@ describe('mapQuoteRows', () => {
           edpName: 'Test EDP',
           edpType: 'flood',
           impact: { score: 1 },
-          levyGbp: { min: 100, max: 200 }
+          levyGbp: {
+            amountExcludingVat: '1100.00',
+            amountInflationAdjusted: '1122.00',
+            baseAmount: '1000.00',
+            modelVersion: 1
+          }
         }
       ],
-      levyGbp: '£100 - £200'
+      levyGbp: {
+        levyAmountExcludingVat: 1100,
+        levyAmountInflationAdjusted: 1122
+      }
     })
   })
 
@@ -79,8 +89,10 @@ describe('mapQuoteRows', () => {
         edp_name: null,
         edp_type: null,
         impact: null,
-        levy_gbp_min: null,
-        levy_gbp_max: null
+        levy_excluding_vat: null,
+        levy_base_amount: null,
+        levy_inflation_adjusted: null,
+        levy_model_version: null
       }
     ]
 
@@ -103,8 +115,10 @@ describe('mapQuoteRows', () => {
         edp_name: null,
         edp_type: null,
         impact: null,
-        levy_gbp_min: null,
-        levy_gbp_max: null
+        levy_excluding_vat: null,
+        levy_base_amount: null,
+        levy_inflation_adjusted: null,
+        levy_model_version: null
       }
     ]
 
@@ -126,8 +140,10 @@ describe('mapQuoteRows', () => {
         edp_name: 'First EDP',
         edp_type: 'flood',
         impact: { nitrogenBand: 'low' },
-        levy_gbp_min: 100,
-        levy_gbp_max: 200
+        levy_excluding_vat: '1100.00',
+        levy_base_amount: '1000.00',
+        levy_inflation_adjusted: '1122.00',
+        levy_model_version: 1
       },
       {
         ...baseRow,
@@ -135,8 +151,10 @@ describe('mapQuoteRows', () => {
         edp_name: 'Second EDP',
         edp_type: 'phosphorus',
         impact: { phosphorusBand: 'high' },
-        levy_gbp_min: 300,
-        levy_gbp_max: 400
+        levy_excluding_vat: '2100.00',
+        levy_base_amount: '2000.00',
+        levy_inflation_adjusted: '2122.00',
+        levy_model_version: 1
       }
     ]
 

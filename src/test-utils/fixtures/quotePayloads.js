@@ -26,7 +26,12 @@ export const validEdpsPayload = {
           band: { min: 1, max: 4 }
         }
       },
-      levyGbp: { min: 100, max: 200 }
+      levyGbp: {
+        amountExcludingVat: 1100,
+        amountInflationAdjusted: 1122,
+        baseAmount: 1000,
+        modelVersion: 1
+      }
     }
   ]
 }

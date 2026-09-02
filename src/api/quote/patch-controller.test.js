@@ -157,10 +157,18 @@ describe('Patch quote endpoint', () => {
             band: { min: 1, max: 4 }
           }
         },
-        levyGbp: { min: '100.00', max: '200.00' }
+        levyGbp: {
+          amountExcludingVat: '1100.00',
+          amountInflationAdjusted: '1122.00',
+          baseAmount: '1000.00',
+          modelVersion: 1
+        }
       }
     ])
-    expect(levyGbp).toBe('£100 - £200')
+    expect(levyGbp).toEqual({
+      levyAmountExcludingVat: 1100,
+      levyAmountInflationAdjusted: 1122
+    })
   })
 
   it('should return 404 when the quote reference does not exist', async () => {
@@ -311,7 +319,15 @@ describe('Patch quote endpoint', () => {
       notifySendEmail.mockClear()
 
       const updatedPayload = {
-        edps: [{ ...validEdpsPayload.edps[0], levyGbp: { min: 150, max: 250 } }]
+        edps: [
+          {
+            ...validEdpsPayload.edps[0],
+            levyGbp: {
+              ...validEdpsPayload.edps[0].levyGbp,
+              amountInflationAdjusted: 150
+            }
+          }
+        ]
       }
 
       await sendPatchRequest({
@@ -336,7 +352,15 @@ describe('Patch quote endpoint', () => {
       const firstSentAt = (await getQuote(reference)).email.sendRequestAt
 
       const updatedPayload = {
-        edps: [{ ...validEdpsPayload.edps[0], levyGbp: { min: 150, max: 250 } }]
+        edps: [
+          {
+            ...validEdpsPayload.edps[0],
+            levyGbp: {
+              ...validEdpsPayload.edps[0].levyGbp,
+              amountInflationAdjusted: 150
+            }
+          }
+        ]
       }
 
       await sendPatchRequest({

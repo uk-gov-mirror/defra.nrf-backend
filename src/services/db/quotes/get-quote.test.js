@@ -18,8 +18,10 @@ describe('dbGetQuote', () => {
       edp_name: 'Test EDP',
       edp_type: 'flood',
       impact: { score: 1 },
-      levy_gbp_min: 100,
-      levy_gbp_max: 200
+      levy_excluding_vat: '1100.00',
+      levy_base_amount: '1000.00',
+      levy_inflation_adjusted: '1122.00',
+      levy_model_version: 1
     }
     const db = { query: vi.fn().mockResolvedValue({ rows: [mockRow] }) }
 
@@ -50,10 +52,18 @@ describe('dbGetQuote', () => {
           edpName: 'Test EDP',
           edpType: 'flood',
           impact: { score: 1 },
-          levyGbp: { min: 100, max: 200 }
+          levyGbp: {
+            amountExcludingVat: '1100.00',
+            amountInflationAdjusted: '1122.00',
+            baseAmount: '1000.00',
+            modelVersion: 1
+          }
         }
       ],
-      levyGbp: '£100 - £200'
+      levyGbp: {
+        levyAmountExcludingVat: 1100,
+        levyAmountInflationAdjusted: 1122
+      }
     })
     expect(result.email.status).toBe('delivered')
   })
@@ -72,8 +82,10 @@ describe('dbGetQuote', () => {
       edp_name: null,
       edp_type: null,
       impact: null,
-      levy_gbp_min: null,
-      levy_gbp_max: null
+      levy_excluding_vat: null,
+      levy_base_amount: null,
+      levy_inflation_adjusted: null,
+      levy_model_version: null
     }
     const db = { query: vi.fn().mockResolvedValue({ rows: [mockRow] }) }
 

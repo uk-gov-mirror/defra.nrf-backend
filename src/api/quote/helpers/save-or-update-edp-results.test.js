@@ -14,7 +14,12 @@ const edp = {
     nitrogenTotal: { amount: 80, unit: 'mg/I TP', band: { min: 1, max: 3 } },
     phosphorusTotal: { amount: 60, unit: 'mg/I TP', band: { min: 1, max: 4 } }
   },
-  levyGbp: { min: 100, max: 200 }
+  levyGbp: {
+    amountExcludingVat: 1100,
+    amountInflationAdjusted: 1122,
+    baseAmount: 1000,
+    modelVersion: 1
+  }
 }
 
 const existingRow = {
@@ -22,8 +27,10 @@ const existingRow = {
   edp_name: 'Norfolk Fens east',
   edp_type: 'NUTRIENT',
   impact: edp.impact,
-  levy_gbp_min: '100.00',
-  levy_gbp_max: '200.00'
+  levy_excluding_vat: '1100.00',
+  levy_base_amount: '1000.00',
+  levy_inflation_adjusted: '1122.00',
+  levy_model_version: 1
 }
 
 const db = {}
@@ -109,29 +116,25 @@ describe('saveOrUpdateEdpResults', () => {
       expect(result).toBe(true)
     })
 
-    it('updates the record and returns true when levy_gbp_min changes', async () => {
-      const updated = { ...edp, levyGbp: { min: 150, max: 200 } }
-      const result = await saveOrUpdateEdpResults({
-        db,
-        quoteId: 1,
-        edps: [updated]
-      })
+    it.each([
+      ['amountExcludingVat', 150],
+      ['amountInflationAdjusted', 250],
+      ['baseAmount', 350],
+      ['modelVersion', 2]
+    ])(
+      'updates the record and returns true when %s changes',
+      async (field, value) => {
+        const updated = { ...edp, levyGbp: { ...edp.levyGbp, [field]: value } }
+        const result = await saveOrUpdateEdpResults({
+          db,
+          quoteId: 1,
+          edps: [updated]
+        })
 
-      expect(dbUpdateEdpResult).toHaveBeenCalled()
-      expect(result).toBe(true)
-    })
-
-    it('updates the record and returns true when levy_gbp_max changes', async () => {
-      const updated = { ...edp, levyGbp: { min: 100, max: 250 } }
-      const result = await saveOrUpdateEdpResults({
-        db,
-        quoteId: 1,
-        edps: [updated]
-      })
-
-      expect(dbUpdateEdpResult).toHaveBeenCalled()
-      expect(result).toBe(true)
-    })
+        expect(dbUpdateEdpResult).toHaveBeenCalled()
+        expect(result).toBe(true)
+      }
+    )
 
     it('updates the record and returns true when impact changes', async () => {
       const updated = {

@@ -65,8 +65,24 @@ import { saveOrUpdateEdpResults } from './helpers/save-or-update-edp-results.js'
  *                         phosphorusTotal:
  *                           $ref: '#/components/schemas/ImpactMeasurement'
  *                     levyGbp:
- *                       type: number
- *                       format: float
+ *                       type: object
+ *                       required:
+ *                         - amountExcludingVat
+ *                         - amountInflationAdjusted
+ *                         - baseAmount
+ *                         - modelVersion
+ *                       properties:
+ *                         amountExcludingVat:
+ *                           type: number
+ *                           format: float
+ *                         amountInflationAdjusted:
+ *                           type: number
+ *                           format: float
+ *                         baseAmount:
+ *                           type: number
+ *                           format: float
+ *                         modelVersion:
+ *                           type: integer
  *     responses:
  *       200:
  *         description: Quote updated

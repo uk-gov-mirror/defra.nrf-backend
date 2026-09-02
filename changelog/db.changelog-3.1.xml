@@ -1,0 +1,46 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+  xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+                      http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-3.9.xsd
+                      http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.9.xsd">
+
+  <changeSet id="29" author="jon.wyatt">
+    <!-- Replace levy_gbp_min/levy_gbp_max with detailed levy breakdown columns. -->
+    <dropColumn tableName="quote_edp_results">
+      <column name="levy_gbp_min" type="NUMERIC"/>
+    </dropColumn>
+    <dropColumn tableName="quote_edp_results">
+      <column name="levy_gbp_max" type="NUMERIC"/>
+    </dropColumn>
+    <addColumn tableName="quote_edp_results">
+      <column name="levy_excluding_vat" type="NUMERIC(12,2)"/>
+      <column name="levy_base_amount" type="NUMERIC(12,2)"/>
+      <column name="levy_inflation_adjusted" type="NUMERIC(12,2)"/>
+      <column name="levy_model_version" type="INTEGER"/>
+    </addColumn>
+    <rollback>
+      <dropColumn tableName="quote_edp_results">
+        <column name="levy_excluding_vat" type="NUMERIC(12,2)"/>
+      </dropColumn>
+      <dropColumn tableName="quote_edp_results">
+        <column name="levy_base_amount" type="NUMERIC(12,2)"/>
+      </dropColumn>
+      <dropColumn tableName="quote_edp_results">
+        <column name="levy_inflation_adjusted" type="NUMERIC(12,2)"/>
+      </dropColumn>
+      <dropColumn tableName="quote_edp_results">
+        <column name="levy_model_version" type="INTEGER"/>
+      </dropColumn>
+      <addColumn tableName="quote_edp_results">
+        <column name="levy_gbp_min" type="NUMERIC"/>
+        <column name="levy_gbp_max" type="NUMERIC"/>
+      </addColumn>
+    </rollback>
+  </changeSet>
+
+</databaseChangeLog>

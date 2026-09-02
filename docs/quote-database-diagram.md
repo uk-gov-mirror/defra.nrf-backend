@@ -4,7 +4,7 @@ Entity-relationship diagram of the backend **`nrf_backend`** Postgres database
 (schema `public`) — the quote domain.
 
 - **Source:** live `nrf_backend` Postgres instance (`docker compose` service `postgres`), cross-checked against the Liquibase changelog under `backend/changelog/`.
-- **Generated:** 2026-08-26
+- **Generated:** 2026-09-02
 - **Scope:** application domain tables only. Liquibase bookkeeping (`databasechangelog`, `databasechangeloglock`) and the PostGIS reference table (`spatial_ref_sys`) are excluded.
 
 ```mermaid
@@ -37,7 +37,7 @@ erDiagram
     user_organisations {
         uuid user_id FK "part of composite primary key (with organisation_defra_id)"
         varchar organisation_defra_id FK "part of composite primary key (with user_id)"
-        varchar relationship_type "nullable; CHECK: employee / agent"
+        varchar relationship_type "nullable; CHECK: Employee / Agent"
     }
 
     quotes {
@@ -70,8 +70,10 @@ erDiagram
         integer edp_id "unique with quote_id"
         varchar edp_name
         varchar edp_type
-        numeric levy_gbp_min
-        numeric levy_gbp_max
+        numeric levy_excluding_vat "nullable"
+        numeric levy_base_amount "nullable"
+        numeric levy_inflation_adjusted "nullable"
+        integer levy_model_version "nullable"
         jsonb impact
         timestamptz created_at "default now()"
         timestamptz updated_at "nullable"
@@ -107,8 +109,9 @@ erDiagram
 - `quotes.reference` is a generated column (`NRL-` + a hashed, zero-padded id) defined via raw SQL in the Liquibase changelog.
 - `quote_access_tokens`, `quote_edp_results` and `quote_email_notifications` foreign keys to `quotes` are `ON DELETE CASCADE`.
 - `user_organisations` rows cascade-delete when their parent `users.id` or `organisations.defra_id` row is deleted.
-- `user_organisations.user_id + organisation_defra_id` form the composite primary key — one row per user/organisation pair. `relationship_type` is nullable and restricted by a CHECK constraint to employee / agent (NULL passes the check) — a Citizen never gets a row here.
+- `user_organisations.user_id + organisation_defra_id` form the composite primary key — one row per user/organisation pair. `relationship_type` is nullable and restricted by a CHECK constraint to Employee / Agent (NULL passes the check) — a Citizen never gets a row here.
 - `users.defra_id` is unique but nullable — users created before signing in have no Defra ID yet (Postgres allows multiple NULLs under a unique constraint).
 - `quotes.user_id` is nullable — a quote can exist without an associated user.
 - `quote_email_notifications.notification_id` is unique; a quote accumulates several rows over its lifetime, distinguished by `email_type`: `quote_result` (initial send), `resend` (user-initiated), `retry` (retry worker re-send) and `retry_rejected` (a retry attempt Notify rejected at accept time — no message exists, so the id is locally generated and the status poller skips these rows; they exist so rejected attempts still consume the retry budget). `status` is null until the Notify status poller first fetches it.
-- This is the backend quote database, not the impact-assessor DB (`nrf_impact`, schema `nrf_reference`).
+- `quote_edp_results` levy columns (`levy_excluding_vat`, `levy_base_amount`, `levy_inflation_adjusted`) are `NUMERIC(12,2)`; `levy_model_version` is `INTEGER`. All four are nullable — they are populated when the impact assessor reports results.
+- This is the backend quote database, not the impact-assessor DB (`nrf_impact`, schema `public`).

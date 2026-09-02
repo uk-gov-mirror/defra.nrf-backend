@@ -14,7 +14,12 @@ const validEdp = {
     nitrogenTotal: validImpactMeasurement,
     phosphorusTotal: validImpactMeasurement
   },
-  levyGbp: { min: 10.0, max: 99.99 }
+  levyGbp: {
+    amountExcludingVat: 10.0,
+    amountInflationAdjusted: 10.0,
+    baseAmount: 10.0,
+    modelVersion: 1
+  }
 }
 
 const validPayload = { edps: [validEdp] }
@@ -202,30 +207,85 @@ describe('patchSchema', () => {
       expect(error).toBeDefined()
     })
 
-    it('requires min', () => {
+    it('requires amountExcludingVat', () => {
+      const { amountExcludingVat: _, ...rest } = validEdp.levyGbp
       const { error } = validate({
-        edps: [{ ...validEdp, levyGbp: { max: 99.99 } }]
+        edps: [{ ...validEdp, levyGbp: rest }]
       })
       expect(error).toBeDefined()
     })
 
-    it('requires max', () => {
+    it('requires amountInflationAdjusted', () => {
+      const { amountInflationAdjusted: _, ...rest } = validEdp.levyGbp
       const { error } = validate({
-        edps: [{ ...validEdp, levyGbp: { min: 10.0 } }]
+        edps: [{ ...validEdp, levyGbp: rest }]
+      })
+      expect(error).toBeDefined()
+    })
+
+    it('requires baseAmount', () => {
+      const { baseAmount: _, ...rest } = validEdp.levyGbp
+      const { error } = validate({
+        edps: [{ ...validEdp, levyGbp: rest }]
+      })
+      expect(error).toBeDefined()
+    })
+
+    it('requires modelVersion', () => {
+      const { modelVersion: _, ...rest } = validEdp.levyGbp
+      const { error } = validate({
+        edps: [{ ...validEdp, levyGbp: rest }]
       })
       expect(error).toBeDefined()
     })
 
     it('accepts decimal values to 2 places', () => {
       const { error } = validate({
-        edps: [{ ...validEdp, levyGbp: { min: 10.55, max: 99.99 } }]
+        edps: [
+          {
+            ...validEdp,
+            levyGbp: { ...validEdp.levyGbp, amountExcludingVat: 10.55 }
+          }
+        ]
       })
       expect(error).toBeUndefined()
     })
 
     it('rejects negative values', () => {
       const { error } = validate({
-        edps: [{ ...validEdp, levyGbp: { min: -1, max: 99.99 } }]
+        edps: [
+          {
+            ...validEdp,
+            levyGbp: { ...validEdp.levyGbp, amountExcludingVat: -1 }
+          }
+        ]
+      })
+      expect(error).toBeDefined()
+    })
+
+    it('requires modelVersion to be an integer', () => {
+      const { error } = validate({
+        edps: [
+          { ...validEdp, levyGbp: { ...validEdp.levyGbp, modelVersion: 1.5 } }
+        ]
+      })
+      expect(error).toBeDefined()
+    })
+
+    it('rejects modelVersion of 0', () => {
+      const { error } = validate({
+        edps: [
+          { ...validEdp, levyGbp: { ...validEdp.levyGbp, modelVersion: 0 } }
+        ]
+      })
+      expect(error).toBeDefined()
+    })
+
+    it('rejects a negative modelVersion', () => {
+      const { error } = validate({
+        edps: [
+          { ...validEdp, levyGbp: { ...validEdp.levyGbp, modelVersion: -1 } }
+        ]
       })
       expect(error).toBeDefined()
     })

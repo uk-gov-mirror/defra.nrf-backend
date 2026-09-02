@@ -40,7 +40,17 @@ const makeQuote = (id) => ({
   planningType: 'full-planning-permission',
   housingUnits: 5,
   email: { address: 'adeola@example.com' },
-  edps: [{ edpName: 'Norfolk Fens east', levyGbp: { min: 100, max: 200 } }]
+  edps: [
+    {
+      edpName: 'Norfolk Fens east',
+      levyGbp: {
+        amountExcludingVat: 1100,
+        amountInflationAdjusted: 1122,
+        baseAmount: 1000,
+        modelVersion: 1
+      }
+    }
+  ]
 })
 
 describe('retryFailedQuoteEmails', () => {

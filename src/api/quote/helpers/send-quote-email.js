@@ -4,6 +4,7 @@ import { config } from '../../../config.js'
 import { createLogger } from '../../../common/helpers/logging/logger.js'
 import { getLevyAmount } from './get-levy-amount.js'
 import { getPlanningTypeDisplay } from './get-planning-type-display.js'
+import { formatCurrency } from '../../../common/helpers/format-currency.js'
 
 const logger = createLogger()
 
@@ -16,7 +17,7 @@ const logger = createLogger()
  * @param {string} params.nrfQuoteReference
  * @param {string} [params.emailReference=nrfQuoteReference] - Notify dedup/reference key for the send; retries pass a suffixed value so a re-send can never be deduplicated against an earlier attempt
  * @param {string} params.nrfServiceUrl
- * @param {Array<{edpName: string, levyGbp: {min: number, max: number}}>} params.edps
+ * @param {Array<{edpName: string, levyGbp: {amountExcludingVat: number, amountInflationAdjusted: number, baseAmount: number, modelVersion: number}}>} params.edps
  * @param {number} params.housingUnits
  * @param {string} params.planningType
  * @param {string} params.quoteAccessLink
@@ -36,6 +37,8 @@ export const sendQuoteEmail = async ({
   quoteAccessLink
 }) => {
   const { templateIds } = config.get('notify')
+  const { levyAmountExcludingVat, levyAmountInflationAdjusted } =
+    getLevyAmount(edps)
   const emailResult = await sendEmail({
     recipientEmailAddress,
     emailReference,
@@ -44,7 +47,8 @@ export const sendQuoteEmail = async ({
       edpNames: edps.map(({ edpName }) => edpName).join(', '),
       housingUnits,
       planningType: getPlanningTypeDisplay(planningType),
-      levyAmount: getLevyAmount(edps),
+      levyAmount: formatCurrency(levyAmountExcludingVat),
+      levyAmountInflationAdjusted: formatCurrency(levyAmountInflationAdjusted),
       nrfServiceUrl,
       quoteAccessLink
     },

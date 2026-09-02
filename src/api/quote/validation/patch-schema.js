@@ -29,8 +29,10 @@ export const patchSchema = joi.object({
           .required(),
         levyGbp: joi
           .object({
-            min: currencySchema,
-            max: currencySchema
+            amountExcludingVat: currencySchema,
+            amountInflationAdjusted: currencySchema,
+            baseAmount: currencySchema,
+            modelVersion: joi.number().integer().min(1).required()
           })
           .required()
       })

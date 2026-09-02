@@ -15,8 +15,10 @@ const makeRow = (overrides = {}) => ({
   edp_name: null,
   edp_type: null,
   impact: null,
-  levy_gbp_min: null,
-  levy_gbp_max: null,
+  levy_excluding_vat: null,
+  levy_base_amount: null,
+  levy_inflation_adjusted: null,
+  levy_model_version: null,
   ...overrides
 })
 
@@ -48,16 +50,20 @@ describe('dbGetAllQuotes', () => {
             edp_name: 'First EDP',
             edp_type: 'flood',
             impact: { score: 1 },
-            levy_gbp_min: 100,
-            levy_gbp_max: 200
+            levy_excluding_vat: '1100.00',
+            levy_base_amount: '1000.00',
+            levy_inflation_adjusted: '1122.00',
+            levy_model_version: 1
           }),
           makeRow({
             edp_id: 'EDP-002',
             edp_name: 'Second EDP',
             edp_type: 'phosphorus',
             impact: { score: 2 },
-            levy_gbp_min: 300,
-            levy_gbp_max: 400
+            levy_excluding_vat: '2100.00',
+            levy_base_amount: '2000.00',
+            levy_inflation_adjusted: '2122.00',
+            levy_model_version: 1
           })
         ]
       })

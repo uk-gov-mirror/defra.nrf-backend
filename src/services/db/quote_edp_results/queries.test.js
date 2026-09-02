@@ -22,7 +22,12 @@ describe('dbSaveEdpResults', () => {
           band: { min: 1, max: 4 }
         }
       },
-      levyGbp: { min: 100, max: 200 }
+      levyGbp: {
+        amountExcludingVat: 1100,
+        amountInflationAdjusted: 1122,
+        baseAmount: 1000,
+        modelVersion: 1
+      }
     }
   ]
 
@@ -34,7 +39,12 @@ describe('dbSaveEdpResults', () => {
       nitrogenTotal: { amount: 10, unit: 'mg/I TP', band: { min: 1, max: 1 } },
       phosphorusTotal: { amount: 5, unit: 'mg/I TP', band: { min: 1, max: 1 } }
     },
-    levyGbp: { min: 200, max: 300 }
+    levyGbp: {
+      amountExcludingVat: 2100,
+      amountInflationAdjusted: 2122,
+      baseAmount: 2000,
+      modelVersion: 1
+    }
   }
 
   it('should insert all EDPs in a single conflict-guarded statement', async () => {
@@ -52,8 +62,10 @@ describe('dbSaveEdpResults', () => {
       'Norfolk Fens east',
       'NUTRIENT',
       JSON.stringify(edps[0].impact),
-      100,
-      200
+      1100,
+      1000,
+      1122,
+      1
     ])
   })
 
@@ -71,15 +83,19 @@ describe('dbSaveEdpResults', () => {
       'Norfolk Fens east',
       'NUTRIENT',
       JSON.stringify(edps[0].impact),
-      100,
-      200,
+      1100,
+      1000,
+      1122,
+      1,
       2,
       456,
       'Broads west',
       'BIODIVERSITY',
       JSON.stringify(broadsWestEdp.impact),
-      200,
-      300
+      2100,
+      2000,
+      2122,
+      1
     ])
   })
 
@@ -123,7 +139,12 @@ describe('dbUpdateEdpResult', () => {
       edpName: 'Updated Name',
       edpType: 'NUTRIENT',
       impact: { nitrogenTotal: { amount: 90 } },
-      levyGbp: { min: 150, max: 250 }
+      levyGbp: {
+        amountExcludingVat: 1200,
+        amountInflationAdjusted: 1222,
+        baseAmount: 1100,
+        modelVersion: 2
+      }
     }
 
     await dbUpdateEdpResult({ db, quoteId: 1, edpId: 123, edp })
@@ -134,8 +155,10 @@ describe('dbUpdateEdpResult', () => {
         'Updated Name',
         'NUTRIENT',
         JSON.stringify({ nitrogenTotal: { amount: 90 } }),
-        150,
-        250,
+        1200,
+        1100,
+        1222,
+        2,
         1,
         123
       ]

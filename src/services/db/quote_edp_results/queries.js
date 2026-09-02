@@ -14,7 +14,7 @@
 /**
  * @param {object} params
  * @param {number} params.quoteId
- * @param {{ edpId: number, edpName: string, edpType: string, impact: object, levyGbp: { min: number, max: number } }} params.edp
+ * @param {{ edpId: number, edpName: string, edpType: string, impact: object, levyGbp: { amountExcludingVat: number, amountInflationAdjusted: number, baseAmount: number, modelVersion: number } }} params.edp
  * @returns {Array} the column values for one quote_edp_results row, in insert order
  */
 const edpRowValues = ({ quoteId, edp }) => [
@@ -23,8 +23,10 @@ const edpRowValues = ({ quoteId, edp }) => [
   edp.edpName,
   edp.edpType,
   JSON.stringify(edp.impact),
-  edp.levyGbp.min,
-  edp.levyGbp.max
+  edp.levyGbp.amountExcludingVat,
+  edp.levyGbp.baseAmount,
+  edp.levyGbp.amountInflationAdjusted,
+  edp.levyGbp.modelVersion
 ]
 
 export const dbSaveEdpResults = async ({ db, quoteId, edps }) => {
@@ -42,7 +44,7 @@ export const dbSaveEdpResults = async ({ db, quoteId, edps }) => {
   })
 
   const { rowCount } = await db.query(
-    `INSERT INTO quote_edp_results (quote_id, edp_id, edp_name, edp_type, impact, levy_gbp_min, levy_gbp_max, created_at)
+    `INSERT INTO quote_edp_results (quote_id, edp_id, edp_name, edp_type, impact, levy_excluding_vat, levy_base_amount, levy_inflation_adjusted, levy_model_version, created_at)
      VALUES ${rowPlaceholders.join(', ')}
      ON CONFLICT (quote_id, edp_id) DO NOTHING`,
     params
@@ -63,14 +65,16 @@ export const dbUpdateEdpResult = async ({ db, quoteId, edpId, edp }) => {
   const { edpName, edpType, impact, levyGbp } = edp
   await db.query(
     `UPDATE quote_edp_results
-     SET edp_name = $1, edp_type = $2, impact = $3, levy_gbp_min = $4, levy_gbp_max = $5, updated_at = NOW()
-     WHERE quote_id = $6 AND edp_id = $7`,
+     SET edp_name = $1, edp_type = $2, impact = $3, levy_excluding_vat = $4, levy_base_amount = $5, levy_inflation_adjusted = $6, levy_model_version = $7, updated_at = NOW()
+     WHERE quote_id = $8 AND edp_id = $9`,
     [
       edpName,
       edpType,
       JSON.stringify(impact),
-      levyGbp.min,
-      levyGbp.max,
+      levyGbp.amountExcludingVat,
+      levyGbp.baseAmount,
+      levyGbp.amountInflationAdjusted,
+      levyGbp.modelVersion,
       quoteId,
       edpId
     ]

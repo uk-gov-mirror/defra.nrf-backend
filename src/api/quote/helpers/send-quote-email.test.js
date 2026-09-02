@@ -15,7 +15,12 @@ describe('sendQuoteEmail', () => {
   const edps = [
     {
       edpName: 'Norfolk Fens east',
-      levyGbp: { min: 100, max: 200 }
+      levyGbp: {
+        amountExcludingVat: 1100,
+        amountInflationAdjusted: 1122,
+        baseAmount: 1000,
+        modelVersion: 1
+      }
     }
   ]
   const housingUnits = 5
@@ -49,7 +54,8 @@ describe('sendQuoteEmail', () => {
         edpNames: 'Norfolk Fens east',
         housingUnits,
         planningType: 'full planning permission',
-        levyAmount: '£100 - £200',
+        levyAmount: '£1,100.00',
+        levyAmountInflationAdjusted: '£1,122.00',
         nrfServiceUrl,
         quoteAccessLink
       },
@@ -83,8 +89,24 @@ describe('sendQuoteEmail', () => {
     const args = {
       ...baseArgs,
       edps: [
-        { edpName: 'One', levyGbp: { min: 100, max: 200 } },
-        { edpName: 'Two', levyGbp: { min: 100, max: 200 } }
+        {
+          edpName: 'One',
+          levyGbp: {
+            amountExcludingVat: 1100,
+            amountInflationAdjusted: 1122,
+            baseAmount: 1000,
+            modelVersion: 1
+          }
+        },
+        {
+          edpName: 'Two',
+          levyGbp: {
+            amountExcludingVat: 1100,
+            amountInflationAdjusted: 1122,
+            baseAmount: 1000,
+            modelVersion: 1
+          }
+        }
       ]
     }
     await sendQuoteEmail(args)

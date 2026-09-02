@@ -43,7 +43,10 @@ describe('Get quote endpoint', () => {
       const { accessStatus, quote } = JSON.parse(response.payload)
       expect(accessStatus).toBe('valid')
       expect(quote.edps).toHaveLength(1)
-      expect(quote.levyGbp).toBe('£100 - £200')
+      expect(quote.levyGbp).toEqual({
+        levyAmountExcludingVat: 1100,
+        levyAmountInflationAdjusted: 1122
+      })
     })
 
     it('should consume a session on redemption', async () => {
